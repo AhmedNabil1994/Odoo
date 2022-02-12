@@ -1,8 +1,7 @@
 from odoo import models , fields,api
 from datetime import date
-
-
-
+from odoo.exceptions import ValidationError
+import re
 
 class ItiPatient(models.Model):
     _name = 'hms.patient'
@@ -25,10 +24,16 @@ class ItiPatient(models.Model):
     PCR=fields.Boolean()
     Image=fields.Image()
     Address=fields.Text()
-    Age=fields.Integer()
+    Age=fields.Integer(compute='CalcAge')
     departments_id=fields.Many2one('hms.departments')
     doctor_id=fields.Many2many('hms.doctors','doctor_patient')
     Capacity=fields.Integer(related="departments_id.Capacity")
+    crm_ids = fields.One2many('crm.lead', 'related_patient_id')
+    Email = fields.Char()
+    website=fields.Char(related="crm_ids.website")
+
+
+
     @api.onchange('Birth_date')
     def _onchange(self):
         if self.Birth_date:
@@ -52,3 +57,31 @@ class ItiPatient(models.Model):
         self.state='Fair'
     def Serious(self):
         self.state='Serious'
+
+    @api.onchange('Email')
+    def MailValidation(self):
+        if self.Email:
+            match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', self.Email)
+            count_email = self.search_count([('Email', '=', self.Email)])
+            print(count_email,"---------------------------------------------------------------------------------")
+            if count_email >= 1 and self.Email is not False:
+                raise ValidationError('This email already exists, please use another one.')
+
+            if match == None:
+                raise ValidationError('Not a valid email ID')
+
+    def CalcAge(self):
+        for rec in self:
+            rec.Age=date.today().year - self.Birth_date.year
+
+
+
+    @api.model
+    def create(self,vals_list):
+        vals_list['Email']=vals_list['First_name']+'@gmail.com'
+        res=super().create(vals_list)
+        return res
+
+    _sql_constraints=[
+        ('email_unique_constraint','UNIQUE(Email)','Email already exists')
+    ]

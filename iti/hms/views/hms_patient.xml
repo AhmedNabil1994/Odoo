@@ -25,10 +25,12 @@
                             <group>
                                 <field name="First_name" required="True"/>
                                 <field name="Last_name" required="True"/>
+                                <field name="Email" required="True"/>
                                 <field name="Birth_date"/>
                                 <field name="history" attrs="{'invisible':[('Age','&lt;','50')]}"/>
                                 <field name="CR_ratio" attrs="{'required':[('PCR','=',True)]}"/>
                                 <field name="state"/>
+                                <field name="website"/>
 
                             </group>
 
@@ -37,7 +39,7 @@
                                 <field name="PCR" attrs="{'checked':[('Age','&lt;','30')]}"/>
                                 <field name="Image"/>
                                 <field name="Address"/>
-                                <field name="Age"/>
+                                <field name="Age" readonly="True"/>
                                 <field name="Capacity"/>
                                 <field string="Department ID" name="departments_id" domain="[('is_opened','=',True)]"/>
                                 <field name="doctor_id" widget="many2many_tags"  attrs="{'readonly':[('departments_id','=',False)]}" />
