@@ -32,8 +32,6 @@ class ItiPatient(models.Model):
     Email = fields.Char()
     website=fields.Char(related="crm_ids.website")
 
-
-
     @api.onchange('Birth_date')
     def _onchange(self):
         if self.Birth_date:
@@ -47,7 +45,6 @@ class ItiPatient(models.Model):
                     }
 
                 }
-    
 
     def Undetermined(self):
         self.state='Undetermined'
@@ -58,34 +55,23 @@ class ItiPatient(models.Model):
     def Serious(self):
         self.state='Serious'
 
-    # @api.constrains('Email')
-    # def _email_validation(self):
-    #     if self.Email:
-    #         match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', self.Email)
-    #         count_email = self.search_count([('Email', '=', self.Email)])
-    #         if count_email >= 1 and self.Email is not False:
-    #             raise ValidationError('This email already exists, please use another one.')
 
-    #         if match == None:
-    #             raise ValidationError('Not a valid email ID')
+    def match_regex(cls, user_input, pattern):
+        if re.fullmatch(pattern, user_input):
+            return True
+        else:
+            return False
 
-
-    @api.onchange('Email')
-    def MailValidation(self):
+    @api.constrains('Email')
+    def _email_validation(self):
         if self.Email:
-            match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', self.Email)
-            count_email = self.search_count([('Email', '=', self.Email)])
-            if count_email >= 1 and self.Email is not False:
-                raise ValidationError('This email already exists, please use another one.')
+            if not self.match_regex(str(self.Email), r"[a-zA-z0-9]+\.[_a-z]+@[a-zA-z]+\.[a-zA-Z]+"):
+                raise ValidationError('Please,Enter a vakid mail.')
 
-            if match == None:
-                raise ValidationError('Not a valid email ID')
 
     def _calc_age(self):
         for rec in self:
             rec.Age=date.today().year - rec.Birth_date.year
-
-
 
     # @api.model
     # def create(self,vals_list):
