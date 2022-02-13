@@ -3,10 +3,10 @@ from odoo.exceptions import UserError
 
 
 class CrmInherit(models.Model):
-    _inherit = 'crm.lead'
-    test = fields.Char()
-    related_patient_id = fields.Many2one('hms.patient', ondelete='restrict')
+    _inherit = 'res.partner'
+    related_patient_id = fields.Many2one('hms.patient')
 
     def unlink(self):
-        if len(self.related_patient_id) != 0 :
+        if self.related_patient_id:
             raise UserError('can not delete ')
+        return super().unlink()    
