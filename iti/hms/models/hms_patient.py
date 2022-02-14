@@ -5,6 +5,7 @@ import re
 
 class ItiPatient(models.Model):
     _name = 'hms.patient'
+    _rec_name="First_name"
     state = fields.Selection([
         ('Undetermined', 'Undetermined'),
         ('Good', 'Good'),
@@ -14,7 +15,7 @@ class ItiPatient(models.Model):
 
     First_name=fields.Char()
     Last_name=fields.Char()
-    Birth_date=fields.Date()
+    birth_date=fields.Date()
     history=fields.Html()
     CR_ratio=fields.Float()
     Blood_type=fields.Selection([
@@ -24,7 +25,7 @@ class ItiPatient(models.Model):
     PCR=fields.Boolean()
     Image=fields.Image()
     Address=fields.Text()
-    Age=fields.Integer(compute='_calc_age')
+    age=fields.Integer(compute='_calc_age')
     departments_id=fields.Many2one('hms.departments')
     doctor_id=fields.Many2many('hms.doctors','doctor_patient')
     Capacity=fields.Integer(related="departments_id.Capacity")
@@ -32,19 +33,21 @@ class ItiPatient(models.Model):
     Email = fields.Char()
     website=fields.Char(related="crm_ids.website")
 
-    @api.onchange('Birth_date')
+    @api.onchange('birth_date')
     def _onchange(self):
-        if self.Birth_date:
-            self.Age=date.today().year-self.Birth_date.year
-            if self.Age <= 30:
-                self.PCR = True
-                return {
-                    'warning': {
-                        'title': 'Alert',
-                        'message': 'PCR has been checked '
-                    }
+        if self.birth_date:
+            self.age=date.today().year-self.birth_date.year
+        else:
+            self.birth_date=date.today()
 
-                }
+    @api.onchange('age')
+    def _on_age_change(self):
+        if self.age < 30:
+            self.PCR = True
+            return{
+                'warning':{"title":"alert","message":"pcr is checked"}
+            }
+
 
     def Undetermined(self):
         self.state='Undetermined'
@@ -66,12 +69,17 @@ class ItiPatient(models.Model):
     def _email_validation(self):
         if self.Email:
             if not self.match_regex(str(self.Email), r"[a-zA-z0-9]+\.[_a-z]+@[a-zA-z]+\.[a-zA-Z]+"):
-                raise ValidationError('Please,Enter a vakid mail.')
+                raise ValidationError('Please,Enter a valid mail.')
 
 
     def _calc_age(self):
         for rec in self:
-            rec.Age=date.today().year - rec.Birth_date.year
+            if rec.birth_date:
+                rec.age=date.today().year - rec.birth_date.year
+                pass
+            else:
+                rec.birth_date="2020-10-10"  
+                
 
     # @api.model
     # def create(self,vals_list):
