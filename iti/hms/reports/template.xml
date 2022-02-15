@@ -1,0 +1,81 @@
+<odoo>
+    <data>
+        <template id="hms_patient_pdf_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="patient">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <h1 class="text-center my-5">Patient Status Report</h1>
+                            <div class="text-right">
+                                <span class="w-25 h-25" t-field="patient.Image" t-options='{"widget": "image"}'/>
+                            </div>
+                            <table class="table table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Age</th>
+                                        <th>Department</th>
+                                        <th>Doctors</th>
+                                        <th>Birth date</th>
+                                        <th>PCR</th>
+                                        <th>Blood Type</th>
+                                        <th>Email</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span t-field="patient.First_name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="patient.age"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="patient.departments_id.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="patient.doctor_id.First_name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="patient.birth_date"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="patient.PCR"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="patient.Blood_type"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="patient.Email"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div>
+                                <h1 class="text-center my-5">Log History</h1>
+                                <table class="table table-striped">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                          <th scope="col">User</th>
+                                          <th scope="col">Date</th>
+                                          <th scope="col">Info</th>
+                                        </tr>
+                                      </thead>
+                                    <tbody>
+                                        <t t-foreach="patient.logs_history" t-as="log">
+                                            <tr>
+                                              <td t-esc="log.create_uid.partner_id.name"/>
+                                              <td t-esc="log.create_date"/>
+                                              <td t-esc="log.description"/>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

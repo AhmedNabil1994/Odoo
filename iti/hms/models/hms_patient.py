@@ -32,6 +32,8 @@ class ItiPatient(models.Model):
     crm_ids = fields.One2many('res.partner', 'related_patient_id')
     Email = fields.Char()
     website=fields.Char(related="crm_ids.website")
+    logs_history = fields.One2many(comodel_name="hms.logs", inverse_name="patient_id")
+
 
     @api.onchange('birth_date')
     def _onchange(self):
@@ -90,3 +92,39 @@ class ItiPatient(models.Model):
     _sql_constraints=[
         ('email_unique_constraint','UNIQUE(Email)','Email already exists')
     ]
+    def Undetermined(self):
+        self.state='Undetermined'
+        self.env['hms.logs'].create({
+            'description': f'State changed to {self.state}',
+            'patient_id': self.id
+        })
+
+    def Good(self):
+        self.state = 'Good'
+        self.env['hms.logs'].create({
+            'description': f'State changed to {self.state}',
+            'patient_id': self.id
+        })
+
+    def Fair(self):
+        self.state = 'Fair'
+        self.env['hms.logs'].create({
+            'description': f'State changed to {self.state}',
+            'patient_id': self.id
+        })
+
+    def Serious(self):
+        self.state = 'Serious'
+        self.env['hms.logs'].create({
+            'description': f'State changed to {self.state}',
+            'patient_id': self.id
+        })
+
+    @api.model
+    def create(self, vals_list):
+        record = super().create(vals_list)
+        self.env['hms.logs'].create({
+            'description': 'Created Patient',
+            'patient_id': record.id
+        })
+        return record

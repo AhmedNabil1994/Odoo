@@ -42,11 +42,29 @@
                                 <field name="age" readonly="True"/>
                                 <field name="Capacity"/>
                                 <field string="Department ID" name="departments_id" domain="[('is_opened','=',True)]"/>
-                                <field name="doctor_id" widget="many2many_tags"  attrs="{'readonly':[('departments_id','=',False)]}" />
+                                <field name="doctor_id" widget="many2many_tags"  attrs="{'readonly':[('departments_id','=',False)]}" groups="hms.hms_manager_group" />
 
                             </group>
 
                         </group>
+                        <notebook>
+                            <page string="Patient Logs">
+                                <group>
+                                    <field name="logs_history" readonly="True">
+                                        <tree>
+                                            <field name="create_uid"/>
+                                            <field name="create_date"/>
+                                            <field name="description"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page> 
+                            <page string="History">
+                                <group>
+                                    <field name="history" attrs="{'invisible':[('age','&lt;','50')]}"/>
+                                </group>
+                            </page> 
+                        </notebook> 
 
                     </sheet>
 
